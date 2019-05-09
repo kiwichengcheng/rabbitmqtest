@@ -65,5 +65,4 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queue001()).to(exchange001()).with("spring.topic001");
     }
 
-
 }

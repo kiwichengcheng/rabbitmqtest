@@ -2,6 +2,7 @@ package com.cctest.rabbitmqtest.testRabbit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -45,5 +46,34 @@ public class RabbitAdminTest {
     @Test
     public void testSendMessage() throws Exception{
         MessageProperties messageProperties = new MessageProperties();
+        messageProperties.getHeaders().put("desc","信息描述");
+        messageProperties.getHeaders().put("type","自定义消息类型...");
+
+        Message message = new Message("hello rabbit mq".getBytes(), messageProperties);
+
+
+        rabbitTemplate.convertAndSend("topic001", "spring.topic001", message, new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                message.getMessageProperties().getHeaders().put("desc","额外的修改信息描述");
+                message.getMessageProperties().getHeaders().put("attr","额外增加的信息");
+                return message;
+            }
+        });
+
+    }
+
+    @Test
+    public void testSendMessage2() throws Exception{
+        /*MessageProperties messageProperties = new MessageProperties();
+        messageProperties.getHeaders().put("desc","信息描述");
+        messageProperties.getHeaders().put("type","自定义消息类型...");
+        messageProperties.setContentType("text/plain");
+
+        Message message = new Message("消息1234".getBytes(), messageProperties);
+
+*/
+        rabbitTemplate.convertAndSend("topic001", "spring.topic001", "消息12345");
+
     }
 }
